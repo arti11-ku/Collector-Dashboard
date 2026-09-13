@@ -1,0 +1,23 @@
+@import "tailwindcss";
+/* Environment styling variables */
+
+@theme {
+  --color-recy-primary: #2D5A27;
+  --color-recy-secondary: #5A7A54;
+  --color-recy-accent: #A5D6A7;
+  --color-recy-bg: #F9FBFA;
+  --color-recy-surface: #FFFFFF;
+  --color-recy-text: #1D3124;
+  --color-recy-text-light: #5A7A54;
+  --color-recy-border: #E0E7E1;
+  --color-recy-divider: #C8D1C9;
+  
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+  background-color: var(--color-recy-bg);
+  color: var(--color-recy-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
