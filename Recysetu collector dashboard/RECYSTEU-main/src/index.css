@@ -11,13 +11,70 @@
   --color-recy-text-light: #5A7A54;
   --color-recy-border: #E0E7E1;
   --color-recy-divider: #C8D1C9;
-  
+
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background-color: var(--color-recy-bg);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(138, 194, 160, 0.25), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(82, 160, 108, 0.12), transparent 26%),
+    linear-gradient(180deg, #EAF7F0 0%, #E3F4EA 40%, #DDF1E6 100%);
   color: var(--color-recy-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  background: transparent;
+}
+
+.recysetu-role-shell {
+  position: relative;
+}
+
+.recysetu-eco-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(39, 84, 45, 0.18);
+  background: rgba(255, 255, 255, 0.54);
+  padding: 0.5rem 0.9rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #2d5a27;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 20px rgba(28, 71, 37, 0.08);
+}
+
+.recysetu-role-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.recysetu-role-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(120, 189, 138, 0.06), transparent 45%, rgba(122, 189, 128, 0.04));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.recysetu-role-card:hover::before {
+  opacity: 1;
+}
+
+::selection {
+  background: rgba(15, 107, 69, 0.16);
+  color: #163c2b;
 }

@@ -53,6 +53,47 @@ const DEFAULT_DEMO_LOCATION = {
   longitude: 81.3509
 };
 
+function normalizeLotStatus(status?: string | null): string {
+  const value = (status || '').toString().trim().toUpperCase();
+  const aliases: Record<string, string> = {
+    HANDED_OVER: 'HANDOVER_CONFIRMED',
+    PICKED_UP: 'HANDOVER_CONFIRMED',
+    PROCESSING: 'PAYMENT_PROCESSING',
+    CREATED: 'PENDING_HANDOVER',
+    REQUESTED: 'PENDING_HANDOVER',
+    SCHEDULED: 'PENDING_HANDOVER',
+    ACCEPTED: 'PENDING_HANDOVER',
+    RECYCLING_COMPLETED: 'COMPLETED',
+    COMPLETED: 'COMPLETED',
+    CANCELLED: 'CANCELLED'
+  };
+  return aliases[value] || value;
+}
+
+function isLotActive(lot: any): boolean {
+  const normalized = normalizeLotStatus(lot?.status);
+  if (!['PENDING_HANDOVER', 'HANDOVER_CONFIRMED', 'PAYMENT_PROCESSING'].includes(normalized)) {
+    return false;
+  }
+
+  if (lot?.assignedPartnerId || lot?.pickupRequestId || lot?.pickupBookingStatus === 'REQUESTED' || lot?.partnerSelectionStatus === 'SELECTED') {
+    return true;
+  }
+
+  const createdAt = lot?.createdAt ? new Date(lot.createdAt).getTime() : Number.NaN;
+  if (Number.isNaN(createdAt)) {
+    return false;
+  }
+
+  const recentThresholdMs = 14 * 24 * 60 * 60 * 1000;
+  const ageMs = Date.now() - createdAt;
+  if (ageMs > recentThresholdMs) {
+    return false;
+  }
+
+  return true;
+}
+
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
@@ -565,11 +606,14 @@ app.get('/api/collector/stats', requireAuth(['collector']), async (req, res) => 
     
     const userDoc = await getDoc(doc(db, 'users', userId));
     const uData = userDoc.data() || {};
+
+    const activeLots = lotsSnap.docs.map(doc => doc.data()).filter(lot => isLotActive(lot)).length;
+    const pendingHandovers = handoversSnap.docs.map(doc => doc.data()).filter(lot => normalizeLotStatus(lot.status) === 'PENDING_HANDOVER' && isLotActive(lot)).length;
     
     res.json({
       activePickups: pickupsSnap.size,
-      activeLots: lotsSnap.size,
-      pendingHandovers: handoversSnap.size,
+      activeLots,
+      pendingHandovers,
       earnings: uData.totalEarnings || 0,
       contributionScore: uData.contributionScore || 'Building',
       points: uData.points || 0
@@ -676,7 +720,7 @@ app.post('/api/collector/transactions/finalize', requireAuth(['collector']), asy
     const existing = await getDocs(query(collection(db, 'lots'), where('collectorId', '==', userId)));
     const existingLot = existing.docs.map(document => document.data()).find(lot => lot.draftId === draftId);
     if (existingLot) return res.json({ success: true, lot: existingLot, duplicate: true });
-    const activeLotCount = existing.docs.map(document => document.data()).filter(lot => !['COMPLETED', 'CANCELLED', 'RECYCLING_COMPLETED'].includes(lot.status)).length;
+    const activeLotCount = existing.docs.map(document => document.data()).filter(lot => isLotActive(lot)).length;
     if (activeLotCount >= 5) return res.status(409).json({ error: 'You can have up to 5 active Lots. Please complete, cancel, or remove an existing eligible Lot before creating another.' });
 
     const lotRef = doc(collection(db, 'lots'));
