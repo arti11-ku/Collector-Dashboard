@@ -17,7 +17,10 @@ export const REFERENCE_MATERIALS: ReferenceMaterial[] = [
   { id: 'router', name: 'Router / Modem', category: 'Phones and Small Electronics', baseRate: 350 },
   { id: 'battery', name: 'Batteries', category: 'Power and Batteries', baseRate: 90 },
   { id: 'cable', name: 'Cables', category: 'Cables and Metals', baseRate: 80 },
+<<<<<<< HEAD
   { id: 'iron', name: 'Iron', category: 'Metals', baseRate: 45 },
+=======
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
   { id: 'other', name: 'Other', category: 'Other E-waste', baseRate: 50 }
 ];
 

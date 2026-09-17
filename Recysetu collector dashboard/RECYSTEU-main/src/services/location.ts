@@ -1,5 +1,6 @@
 import type { ResolvedLocation } from '../context/TransactionDraftContext';
 
+<<<<<<< HEAD
 export const LOCATION_MODE = 'DEMO';
 export const DEMO_LOCATION: ResolvedLocation = {
   formattedAddress: 'Nehru Nagar, Bhilai, Durg District, Chhattisgarh, 490020, India',
@@ -13,6 +14,8 @@ export const DEMO_LOCATION: ResolvedLocation = {
   longitude: 81.3509
 };
 
+=======
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
 interface GeocodeResult {
   display_name?: string;
   lat?: string;
@@ -55,10 +58,13 @@ export async function forwardGeocode(address: string) {
   return geocode(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&countrycodes=in&q=${encodeURIComponent(address)}`);
 }
 
+<<<<<<< HEAD
 export function detectLocation(): ResolvedLocation | null {
   return LOCATION_MODE === 'DEMO' ? { ...DEMO_LOCATION } : null;
 }
 
+=======
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
 export function locationLabel(location?: ResolvedLocation) {
   if (!location) return '';
   return [location.city, location.state].filter(Boolean).join(', ') || location.formattedAddress;

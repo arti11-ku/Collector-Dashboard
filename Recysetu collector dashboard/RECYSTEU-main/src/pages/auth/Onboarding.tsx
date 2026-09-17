@@ -3,7 +3,11 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Loader2, MapPin } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+<<<<<<< HEAD
 import { detectLocation, forwardGeocode, reverseGeocode } from '../../services/location';
+=======
+import { forwardGeocode, reverseGeocode } from '../../services/location';
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
 
 export function Onboarding() {
   const navigate = useNavigate();
@@ -29,6 +33,7 @@ export function Onboarding() {
   }, [preferredLanguage, i18n]);
 
   const handleDetectLocation = () => {
+<<<<<<< HEAD
     const demoLocation = detectLocation();
     if (demoLocation) {
       setLocationLoading(true);
@@ -41,6 +46,8 @@ export function Onboarding() {
       return;
     }
 
+=======
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
     if (!navigator.geolocation) {
       setError(t('geo_unsupported'));
       return;

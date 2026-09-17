@@ -39,7 +39,10 @@ export function useVoiceEngine(language: VoiceLanguage, onTurnComplete?: (text: 
   const transcriptRef = useRef('');
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const callbackRef = useRef(onTurnComplete);
+<<<<<<< HEAD
   const speechStartedRef = useRef(false);
+=======
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
   const [state, setState] = useState<VoiceState>('IDLE');
   const [transcript, setTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
@@ -140,8 +143,11 @@ export function useVoiceEngine(language: VoiceLanguage, onTurnComplete?: (text: 
     }
 
     stopListening();
+<<<<<<< HEAD
     setError('');
     speechStartedRef.current = false;
+=======
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = languageCodes[language];
@@ -151,6 +157,7 @@ export function useVoiceEngine(language: VoiceLanguage, onTurnComplete?: (text: 
     utterance.pitch = 1.15;
     utterance.volume = 1;
 
+<<<<<<< HEAD
     utterance.onstart = () => {
       speechStartedRef.current = true;
       setState('SPEAKING');
@@ -161,6 +168,13 @@ export function useVoiceEngine(language: VoiceLanguage, onTurnComplete?: (text: 
         setState('IDLE');
         setError('');
       }
+=======
+    utterance.onstart = () => setState('SPEAKING');
+    utterance.onend = () => setState('IDLE');
+    utterance.onerror = () => {
+      setState('ERROR');
+      setError('Speech output could not start. The response remains available as text.');
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
     };
 
     window.speechSynthesis.speak(utterance);

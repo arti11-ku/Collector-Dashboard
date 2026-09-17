@@ -20,11 +20,14 @@ export function Assistant() {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const voice = useVoiceEngine(i18n.language === 'hi' || i18n.language === 'mr' ? i18n.language : 'en');
+<<<<<<< HEAD
   const profileLocation = user?.location || (user?.address ? {
     formattedAddress: user.address,
     latitude: user.latitude,
     longitude: user.longitude
   } : null);
+=======
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -52,7 +55,11 @@ export function Assistant() {
     const normalized = userMessage.toLowerCase();
     const digitMap: Record<string, string> = { '५': '5', '३': '3', '२': '2', '१': '1', '४': '4', '६': '6', '७': '7', '८': '8', '९': '9', '०': '0' };
     const normalizedDigits = normalized.replace(/[०-९]/g, digit => digitMap[digit] || digit);
+<<<<<<< HEAD
     const materialAliases: Record<string, string[]> = { mobile: ['mobile', 'मोबाइल', 'मोबाईल'], laptop: ['laptop', 'लैपटॉप', 'लॅपटॉप'], battery: ['battery', 'बैटरी', 'बॅटरी'], pcb: ['pcb'], copper: ['copper', 'तांबा'], aluminium: ['aluminium', 'aluminum', 'एल्युमिनियम'], iron: ['iron', 'लोहे', 'लोहा'] };
+=======
+    const materialAliases: Record<string, string[]> = { mobile: ['mobile', 'मोबाइल', 'मोबाईल'], laptop: ['laptop', 'लैपटॉप', 'लॅपटॉप'], battery: ['battery', 'बैटरी', 'बॅटरी'], pcb: ['pcb'], copper: ['copper', 'तांबा'], aluminium: ['aluminium', 'aluminum', 'एल्युमिनियम'] };
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
     const detected = Object.entries(materialAliases).flatMap(([materialId, aliases]) => {
       const alias = aliases.find(value => normalized.includes(value));
       if (!alias) return [];
@@ -79,6 +86,7 @@ export function Assistant() {
     try {
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
+<<<<<<< HEAD
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -88,13 +96,23 @@ export function Assistant() {
           draft,
           location: profileLocation
         })
+=======
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage })
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
       });
       
       if (!res.ok) { const failure = await res.json().catch(() => ({})); throw new Error(failure.error || 'The assistant service returned an error.'); }
       const data = await res.json();
+<<<<<<< HEAD
       if (typeof data.reply !== 'string' || !data.reply.trim()) throw new Error('The assistant returned an empty response. Please try again.');
       
       setMessages(prev => [...prev, { role: 'assistant', content: data.reply.trim() }]);
+=======
+      
+      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+      voice.speak(data.reply);
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
     } catch (error) {
       setMessages(prev => [...prev, { role: 'assistant', content: error instanceof Error ? error.message : 'The assistant service returned an error.' }]);
     } finally {

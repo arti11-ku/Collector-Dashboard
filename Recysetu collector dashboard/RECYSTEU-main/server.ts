@@ -15,6 +15,7 @@ import { forwardGeocode } from './src/services/location';
 import { calculatePartnerOffer, nearbyPartners } from './src/services/partnerDirectory';
 import { findReferenceMaterial, referencePrice as getReferencePrice } from './src/services/pricingCatalog';
 
+<<<<<<< HEAD
 const envFiles = [
   path.resolve(process.cwd(), '.env'),
   path.resolve(path.dirname(process.argv[1] || ''), '.env'),
@@ -24,6 +25,9 @@ for (const envFile of envFiles) {
   if (fs.existsSync(envFile)) dotenv.config({ path: envFile });
 }
 console.log(`[assistant] Gemini API key configured: ${Boolean(process.env.GEMINI_API_KEY)}`);
+=======
+dotenv.config({ path: path.resolve('.env') });
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
 
 // Suppress noisy Firestore BloomFilter errors
 const originalConsoleError = console.error;
@@ -61,6 +65,7 @@ const DEFAULT_DEMO_LOCATION = {
   longitude: 81.3509
 };
 
+<<<<<<< HEAD
 function resolveStoredLocation(user: any) {
   const stored = user?.location || {};
   const latitude = Number(stored.latitude ?? user?.latitude);
@@ -77,6 +82,8 @@ function resolveStoredLocation(user: any) {
   };
 }
 
+=======
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
 function normalizeLotStatus(status?: string | null): string {
   const value = (status || '').toString().trim().toUpperCase();
   const aliases: Record<string, string> = {
@@ -1700,6 +1707,7 @@ startServer();
 function setupChatEndpoint(app, db, requireAuth) {
   // We'll initialize it lazily to handle cases where it might not be set initially
   let ai = null;
+<<<<<<< HEAD
   const normalizeAssistantMaterial = (value: unknown) => {
     const input = String(value || '').trim().toLowerCase();
     const aliases: Record<string, string[]> = {
@@ -1760,21 +1768,41 @@ function setupChatEndpoint(app, db, requireAuth) {
         if (!process.env.GEMINI_API_KEY) {
           console.error('Assistant request failed: Gemini configuration missing');
           return res.status(503).json({ error: 'The assistant is temporarily unavailable because Gemini is not configured on the server.' });
+=======
+
+  app.post('/api/ai/chat', requireAuth(['collector']), async (req, res) => {
+    try {
+      if (!ai) {
+        if (!process.env.GEMINI_API_KEY) {
+          return res.status(400).json({ error: 'AI service is not configured. Add the required Gemini API environment variable (GEMINI_API_KEY).' });
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
         }
         ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       }
 
+<<<<<<< HEAD
+=======
+      const { message } = req.body;
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
       const userId = req.user.userId;
 
       // Define our tools for Gemini
       const findNearbyPartners = async (args) => {
         const { materialName } = args;
+<<<<<<< HEAD
         const materialId = normalizeAssistantMaterial(materialName);
         const userDoc = await getDoc(doc(db, 'users', userId));
         const user = userDoc.data();
         const location = resolveStoredLocation(user);
         if (location.latitude == null || location.longitude == null) return { material: materialName, error: 'Location is unresolved. Ask the collector to update the saved address.' };
         const price = getReferencePrice(findReferenceMaterial(materialId)?.id || materialId, location.state);
+=======
+        const userDoc = await getDoc(doc(db, 'users', userId));
+        const user = userDoc.data();
+        const location = (user as any)?.location;
+        if (!location?.latitude || !location?.longitude) return { material: materialName, error: 'Location is unresolved. Ask the collector for city and state.' };
+        const price = getReferencePrice(findReferenceMaterial(String(materialName))?.id || String(materialName).toLowerCase(), location.state);
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
         const partners = nearbyPartners(Number(location.latitude), Number(location.longitude), 25);
         return {
            material: materialName,
@@ -1785,8 +1813,12 @@ function setupChatEndpoint(app, db, requireAuth) {
 
       const getMaterialPrice = async (args) => {
         const { materialName } = args;
+<<<<<<< HEAD
         const materialId = normalizeAssistantMaterial(materialName);
         const price = getReferencePrice(findReferenceMaterial(materialId)?.id || materialId, undefined);
+=======
+        const price = getReferencePrice(findReferenceMaterial(String(materialName))?.id || String(materialName).toLowerCase(), undefined);
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
         return price || { error: `No reliable reference price is configured for ${materialName}.` };
       };
 
@@ -1818,6 +1850,7 @@ const getPaymentStatus = async () => {        return 'Your last payment of ₹45
     { name: "getPaymentStatus", description: "Get information about the user payments and earnings.", parameters: { type: Type.OBJECT, properties: {} } }
   ]
 }];
+<<<<<<< HEAD
   const chat = ai.chats.create({
   model: 'gemini-3.5-flash-lite',
   history: history.slice(-12).map(item => ({ role: item.role === 'assistant' ? 'model' : 'user', parts: [{ text: item.content }] })),
@@ -1835,6 +1868,20 @@ const getPaymentStatus = async () => {        return 'Your last payment of ₹45
       const response = await chat.sendMessage({ message: assistantMessage });
       
       let finalReply = response.text || response.candidates?.flatMap((candidate: any) => candidate.content?.parts || []).map((part: any) => part.text).filter(Boolean).join('') || '';
+=======
+const chat = ai.chats.create({
+  model: 'gemini-2.5-flash',
+  config: {
+    systemInstruction: `You are the RECYSETU AI Assistant. You help informal waste collectors in India book pickups, check prices, and track their score. You must use tools to perform actions and fetch real data. You understand English, Hindi, Marathi, and Hinglish/transliterations. IMPORTANT: You MUST respond in the EXACT same language that the user used. If they write in Hindi, reply in Hindi. If they write in Marathi, reply in Marathi. If they write in transliterated Hindi (Hinglish), reply in Hindi or Hinglish.
+CRITICAL SELLING WORKFLOW: When a collector says they want to sell a material, you MUST FIRST use 'findNearbyPartners' to get the current price for that material AND find nearby aggregators/recyclers matching their location. Then, tell them the price and present the nearby options (with their distances and offered prices). Ask if they want to go drop it off themselves or if they want to schedule a pickup. ONLY create a pickup request if they explicitly confirm they want a pickup scheduled. Be helpful, concise, and polite.`,
+    tools: tools,
+    temperature: 0.1
+  }
+});
+const response = await chat.sendMessage({ message });
+      
+      let finalReply = response.text;
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
 
       // Handle function calls
       if (response.functionCalls && response.functionCalls.length > 0) {
@@ -1868,6 +1915,7 @@ else if (call.name === 'getPaymentStatus') result = await getPaymentStatus();
         }
         
         const finalResponse = await chat.sendMessage({ message: functionResponses });
+<<<<<<< HEAD
         finalReply = finalResponse.text || finalResponse.candidates?.flatMap((candidate: any) => candidate.content?.parts || []).map((part: any) => part.text).filter(Boolean).join('') || '';
       }
 
@@ -1904,6 +1952,16 @@ else if (call.name === 'getPaymentStatus') result = await getPaymentStatus();
       console.error('Assistant request failed:', detail.slice(0, 500));
       const status = /api key|authentication|permission|unauthorized|forbidden/i.test(detail) ? 502 : 500;
       res.status(status).json({ error: 'The assistant could not complete that request. Please try again.' });
+=======
+        finalReply = finalResponse.text;
+      }
+
+      res.json({ reply: finalReply });
+
+    } catch (error) {
+      console.error('Chat error:', error);
+      res.status(500).json({ error: error instanceof Error ? error.message : 'AI service request failed.' });
+>>>>>>> 550257736ef939bfdbb8f351fd068c9a4847a47c
     }
   });
 }
