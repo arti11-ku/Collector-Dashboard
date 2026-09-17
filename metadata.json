@@ -1,0 +1,9 @@
+{
+  "name": "RECYSETU",
+  "description": "Empowering Informal Recycling, Building a Cleaner Future",
+  "requestFramePermissions": [
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
